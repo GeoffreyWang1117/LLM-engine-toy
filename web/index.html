@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Engine Toy - WebAssembly Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 LLM Engine Toy</h1>
+            <p class="subtitle">基于WebAssembly的轻量级LLM推理引擎演示</p>
+            <a href="https://github.com/GeoffreyWang1117/LLM-engine-toy" target="_blank" class="github-link">
+                View on GitHub
+            </a>
+        </header>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>正在加载WebAssembly模块...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <section class="demo-section">
+                <h2>📊 矩阵运算演示</h2>
+                <div class="demo-box">
+                    <button onclick="runMatrixDemo()" class="btn btn-primary">运行矩阵乘法示例</button>
+                    <pre id="matrix-output" class="output"></pre>
+                </div>
+            </section>
+
+            <section class="demo-section">
+                <h2>🧮 Linear层演示</h2>
+                <div class="demo-box">
+                    <div class="input-group">
+                        <label>输入维度: <input type="number" id="linear-in" value="4" min="1" max="32"></label>
+                        <label>输出维度: <input type="number" id="linear-out" value="3" min="1" max="32"></label>
+                    </div>
+                    <button onclick="runLinearDemo()" class="btn btn-primary">运行Linear层</button>
+                    <pre id="linear-output" class="output"></pre>
+                </div>
+            </section>
+
+            <section class="demo-section">
+                <h2>🔄 LayerNorm演示</h2>
+                <div class="demo-box">
+                    <button onclick="runLayerNormDemo()" class="btn btn-primary">运行LayerNorm</button>
+                    <pre id="layernorm-output" class="output"></pre>
+                </div>
+            </section>
+
+            <section class="demo-section">
+                <h2>🎯 Self-Attention演示</h2>
+                <div class="demo-box">
+                    <div class="input-group">
+                        <label>嵌入维度: <input type="number" id="attn-dim" value="8" min="2" max="32" step="2"></label>
+                        <label>注意力头数: <input type="number" id="attn-heads" value="2" min="1" max="8"></label>
+                    </div>
+                    <button onclick="runAttentionDemo()" class="btn btn-primary">运行Self-Attention</button>
+                    <pre id="attention-output" class="output"></pre>
+                </div>
+            </section>
+
+            <section class="demo-section">
+                <h2>🔮 FeedForward演示</h2>
+                <div class="demo-box">
+                    <button onclick="runFFNDemo()" class="btn btn-primary">运行FeedForward Network</button>
+                    <pre id="ffn-output" class="output"></pre>
+                </div>
+            </section>
+
+            <section class="demo-section info-section">
+                <h2>ℹ️ 关于项目</h2>
+                <div class="info-box">
+                    <p>这是一个从零开始构建的toy级别LLM推理引擎，用于学习和理解Transformer模型的底层实现。</p>
+                    <h3>技术栈</h3>
+                    <ul>
+                        <li>C++17 - 核心实现语言</li>
+                        <li>WebAssembly - 浏览器端运行</li>
+                        <li>Emscripten - C++到WASM编译工具</li>
+                    </ul>
+                    <h3>已实现功能</h3>
+                    <ul>
+                        <li>✅ 基础矩阵运算（加法、乘法、转置）</li>
+                        <li>✅ Linear层（全连接层）</li>
+                        <li>✅ LayerNorm（层归一化）</li>
+                        <li>✅ Self-Attention（自注意力机制）</li>
+                        <li>✅ FeedForward Network（前馈网络）</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="dist/llm_engine.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
