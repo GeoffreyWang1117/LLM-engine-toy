@@ -34,3 +34,7 @@ cmake_install.cmake
 # Other
 *.log
 .DS_Store
+
+# Large model weight files
+weights/*.safetensors
+weights/**/*.safetensors

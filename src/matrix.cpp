@@ -1,6 +1,7 @@
 #include "llm_engine/matrix.h"
 #include <random>
 #include <iomanip>
+#include <algorithm>
 
 namespace llm {
 
@@ -78,7 +79,7 @@ Matrix Matrix::operator*(float scalar) const {
     return result;
 }
 
-// 矩阵乘法 (简单的三重循环实现)
+// 矩阵乘法 (优化版本：使用cache-friendly访问模式和分块)
 Matrix Matrix::matmul(const Matrix& other) const {
     if (cols_ != other.rows_) {
         throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
@@ -86,13 +87,40 @@ Matrix Matrix::matmul(const Matrix& other) const {
 
     Matrix result(rows_, other.cols_, 0.0f);
 
-    for (size_t i = 0; i < rows_; ++i) {
-        for (size_t j = 0; j < other.cols_; ++j) {
-            float sum = 0.0f;
+    // 分块大小（根据L1 cache优化）
+    constexpr size_t BLOCK_SIZE = 64;
+
+    // 如果矩阵较小，使用简单但优化的实现
+    if (rows_ < BLOCK_SIZE && other.cols_ < BLOCK_SIZE && cols_ < BLOCK_SIZE) {
+        // 优化的访问模式：i-k-j顺序，利用cache locality
+        for (size_t i = 0; i < rows_; ++i) {
             for (size_t k = 0; k < cols_; ++k) {
-                sum += at(i, k) * other.at(k, j);
+                float a_ik = at(i, k);
+                for (size_t j = 0; j < other.cols_; ++j) {
+                    result.at(i, j) += a_ik * other.at(k, j);
+                }
             }
-            result.at(i, j) = sum;
+        }
+    } else {
+        // 分块矩阵乘法（对大矩阵更高效）
+        for (size_t ii = 0; ii < rows_; ii += BLOCK_SIZE) {
+            for (size_t jj = 0; jj < other.cols_; jj += BLOCK_SIZE) {
+                for (size_t kk = 0; kk < cols_; kk += BLOCK_SIZE) {
+                    // 处理每个块
+                    size_t i_end = std::min(ii + BLOCK_SIZE, rows_);
+                    size_t j_end = std::min(jj + BLOCK_SIZE, other.cols_);
+                    size_t k_end = std::min(kk + BLOCK_SIZE, cols_);
+
+                    for (size_t i = ii; i < i_end; ++i) {
+                        for (size_t k = kk; k < k_end; ++k) {
+                            float a_ik = at(i, k);
+                            for (size_t j = jj; j < j_end; ++j) {
+                                result.at(i, j) += a_ik * other.at(k, j);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
